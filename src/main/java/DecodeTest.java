@@ -17,7 +17,10 @@ import java.util.stream.Collectors;
 public class DecodeTest {
 
     public static void main(String[] args) {
-        String conf = "uid = -2147483648 : -1147483648, 2200000000:2300000000\n" + "login_name = -2147483648:-1147483648,2200000000:2300000000\n" + "user_id = ";
+        String conf = "uid = -2147483648 : -1147483648, 2200000000 : 2300000000,1999420003:1999420004\n"
+            + "login_name =  -2147483648 : -1147483648, 2200000000 : 2300000000,1999420003:1999420004\n"
+            + "user_id =  -2147483648 : -1147483648, 2200000000 : 2300000000,1999420003:1999420004\n"
+            + "ucid =  -2147483648 : -1147483648, 2200000000 : 2300000000,1999420003:1999420004";
         // 首先切割换行符
         Map<String, Map<Long, Long>> collect = Arrays.stream(conf.split("[\n\r]")).map(String::trim)
             // 切割第一层key和value值（对应uid的范围/login_name的范围）

@@ -2,12 +2,15 @@ package number;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * TODO，description of NumberTest
@@ -17,7 +20,41 @@ import java.util.Map;
  * @date 2021/12/6 5:13 PM
  */
 public class NumberTest {
+    private static boolean isInIllegalRange(String checkKey, Long eachUid) {
+        String inputStr =
+            "{\"uid\": {\"-2147483648\": \"-1147483648\",\"2200000000\": \"2300000000\"},\"login_name\": {\"-2147483648\": \"-1147483648\",\"2200000000\": \"2300000000\"},\"user_id\": {\"-2147483648\": \"-1147483648\",\"2200000000\": \"2300000000\"},\"ucid\": {\"-2147483648\": \"-1147483648\",\"2200000000\": \"2300000000\"}}";
+        return eachUid != null && JSON.parseObject(inputStr).getJSONObject(checkKey).entrySet().stream()
+            .anyMatch((pair) -> (eachUid >= new Long(pair.getKey())) && (eachUid <= new Long(pair.getValue().toString())));
+    }
+
+    private static boolean isInIllegalRange2(String checkKey, Long eachUid) {
+        String inputStr = "uid = -2147483648 : -1147483648, 2200000000 : 2300000000\n" + "login_name =  -2147483648 : -1147483648, 2200000000 : 2300000000\n"
+            + "user_id =  -2147483648 : -1147483648, 2200000000 : 2300000000\n" + "ucid =  -2147483648 : -1147483648, 2200000000 : 2300000000";
+        Function<String, Map<String, Map<Long, Long>>> stringMapFunction = (String conf) -> Arrays.stream(conf.split("[\n\r]")).map(String::trim).filter(StringUtils::isNotEmpty)
+            // 切割第一层key和value值（对应uid的范围/login_name的范围）
+            .map(eachConf -> eachConf.split("="))
+            .collect(Collectors.toMap(eachConfSplit -> eachConfSplit.length > 0 ? eachConfSplit[0].trim() : "", eachConfSplit -> eachConfSplit.length < 2 ? new HashMap<>(2) :
+                // 切割第二层key和value值（对应每一个具体的范围
+                Arrays.stream(eachConfSplit[1].split(",")).map(String::trim).filter(StringUtils::isNotEmpty)
+                    .collect(Collectors.toMap(((pair) -> new Long(pair.split(":")[0].trim())), (pair) -> new Long(pair.split(":")[1].trim())))));
+        return stringMapFunction.apply(inputStr).getOrDefault(checkKey, new HashMap<>()).entrySet().stream()
+            .anyMatch((pair) -> (eachUid >= pair.getKey()) && (eachUid <= pair.getValue()));
+
+    }
+
     public static void main(String[] args) {
+        long begin = System.currentTimeMillis();
+        int tims = 10000000;
+        for (int i = 0; i < tims; i++) {
+            isInIllegalRange("uid", -2000000000L);
+        }
+        System.out.println("JSONObject cost: " + (System.currentTimeMillis() - begin));
+
+        begin = System.currentTimeMillis();
+        for (int i = 0; i < tims; i++) {
+            isInIllegalRange2("uid", -2000000000L);
+        }
+        System.out.println("self format cost: " + (System.currentTimeMillis() - begin));
         Map<String, Object> src = new HashMap<>();
         src.put("hahaha", Long.MAX_VALUE % (1L << 40));
         // src.put("hahaha", 36028797018963967);
@@ -143,6 +180,7 @@ public class NumberTest {
         NUM_IS_DECIMAL_CACHE.put(double.class, true);
 
     }
+
     class TestObj {
         int a;
         Integer b;
