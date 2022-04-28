@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,6 +44,12 @@ public class NumberTest {
     }
 
     public static void main(String[] args) {
+        System.out.println(new BigInteger("2200000000").intValue());
+
+
+        System.out.println((long)-2094897293 + Integer.MAX_VALUE + Integer.MAX_VALUE);
+
+
         long begin = System.currentTimeMillis();
         int tims = 10000000;
         for (int i = 0; i < tims; i++) {
