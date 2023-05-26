@@ -1,11 +1,8 @@
 package stream;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * TODO，description of RiskInfo
