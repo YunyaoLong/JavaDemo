@@ -15,6 +15,14 @@ import java.util.List;
  */
 public class ReadObjectTest {
     public static void main(String[] args) {
+        CloneableDomain cloneableDomain = new CloneableDomain();
+        CloneableDomain cloneableDomain1 = cloneableDomain.clone();
+
+        System.out.println(cloneableDomain1 == cloneableDomain);
+        System.out.println(cloneableDomain1.domain == cloneableDomain.domain);
+
+        System.out.println(null instanceof String);
+
         Domain domain = new Domain(10, "20");
         List<String> filedList = Arrays.asList("intField", "strField");
         try {
@@ -36,5 +44,20 @@ public class ReadObjectTest {
             throw new RuntimeException(e);
         }
         intField.setAccessible(false);
+    }
+
+    static class CloneableDomain implements Cloneable {
+        private Domain domain = new Domain();
+
+        @Override
+        public CloneableDomain clone() {
+            try {
+                CloneableDomain clone = (CloneableDomain)super.clone();
+                // TODO: copy mutable state here, so the clone can't change the internals of the original
+                return clone;
+            } catch (CloneNotSupportedException e) {
+                throw new AssertionError();
+            }
+        }
     }
 }
